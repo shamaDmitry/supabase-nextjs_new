@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/src/utils/supabase/client";
 import { type User } from "@supabase/supabase-js";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/src/components/ui/input";
+import { Button } from "@/src/components/ui/button";
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient();
@@ -12,17 +12,23 @@ export default function AccountForm({ user }: { user: User | null }) {
   const [fullname, setFullname] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [website, setWebsite] = useState<string | null>(null);
-  const [avatar_url, setAvatarUrl] = useState<string | null>(null);
+  // const [avatar_url, setAvatarUrl] = useState<string | null>(null);
 
   const getProfile = useCallback(async () => {
     try {
       setLoading(true);
 
+      // const { data, error, status } = await supabase
+      //   .from("auth.users")
+      //   .select(`*`)
+      //   .eq("user_id", user?.id)
+      //   .single();
+
       const { data, error, status } = await supabase
-        .from("users")
-        .select(`*`)
-        .eq("user_id", user?.id)
-        .single();
+        .from("profiles")
+        .select("*");
+
+      console.log({ data, error, status });
 
       // if (error && status !== 406) {
       //   console.log(error);
@@ -37,7 +43,7 @@ export default function AccountForm({ user }: { user: User | null }) {
       //   setAvatarUrl(data.avatar_url);
       // }
     } catch (error) {
-      alert("Error loading user data!");
+      console.log("Error loading user data!", error);
     } finally {
       setLoading(false);
     }
@@ -50,12 +56,12 @@ export default function AccountForm({ user }: { user: User | null }) {
   async function updateProfile({
     username,
     website,
-    avatar_url,
-  }: {
+  }: // avatar_url,
+  {
     username: string | null;
     fullname: string | null;
     website: string | null;
-    avatar_url: string | null;
+    // avatar_url: string | null;
   }) {
     try {
       setLoading(true);
@@ -65,13 +71,15 @@ export default function AccountForm({ user }: { user: User | null }) {
         full_name: fullname,
         username,
         website,
-        avatar_url,
+        // avatar_url,
         updated_at: new Date().toISOString(),
       });
+
       if (error) throw error;
+
       alert("Profile updated!");
     } catch (error) {
-      alert("Error updating the data!");
+      console.log("Error updating the data!", error);
     } finally {
       setLoading(false);
     }
@@ -116,20 +124,17 @@ export default function AccountForm({ user }: { user: User | null }) {
         <Button
           className="button primary block"
           onClick={() =>
-            updateProfile({ fullname, username, website, avatar_url })
+            updateProfile({
+              fullname,
+              username,
+              website,
+              // avatar_url
+            })
           }
           disabled={loading}
         >
           {loading ? "Loading ..." : "Update"}
         </Button>
-      </div>
-
-      <div>
-        <form action="/api/auth/signout" method="post">
-          <button className="button block" type="submit">
-            Sign out
-          </button>
-        </form>
       </div>
     </div>
   );

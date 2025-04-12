@@ -1,5 +1,5 @@
-import AccountForm from "@/components/pages/account/account-form";
-import { createClient } from "@/utils/supabase/server";
+import AccountForm from "@/src/components/pages/account/account-form";
+import { createClient } from "@/src/utils/supabase/server";
 
 const AccountPage = async () => {
   const supabase = await createClient();
